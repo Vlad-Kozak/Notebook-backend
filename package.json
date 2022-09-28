@@ -4,11 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "prebuild": "npm run lint",
-    "build": "tsc",
-    "prestart": "npm run build",
-    "start": "node .",
-    "server:watch": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "repository": {
     "type": "git",
@@ -34,7 +32,10 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
+    "@types/http-errors": "^1.8.2",
     "@types/morgan": "^1.9.3",
+    "concurrently": "^7.4.0",
+    "nodemon": "^2.0.20",
     "ts-node-dev": "^2.0.0"
   }
 }

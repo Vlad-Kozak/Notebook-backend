@@ -12,6 +12,24 @@ const config = convict({
     default: 3000,
     env: "PORT",
   },
+  dbUrl: {
+    doc: "MongoDB connection URL",
+    format: String,
+    default: "",
+    env: "DB_URL",
+  },
+  saltRounds: {
+    doc: "saltRounds",
+    format: Number,
+    default: 12,
+    env: "BCRYPT_SALT_ROUNDS",
+  },
+  secret: {
+    doc: "JWT secret",
+    format: String,
+    default: "",
+    env: "JWT_SECRET",
+  },
 });
 
 export const conf = config.validate({ allowed: strict }).getProperties();

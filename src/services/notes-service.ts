@@ -1,59 +1,39 @@
-import { NotFound } from "http-errors";
-import { v4 as uuidv4 } from "uuid";
-import { readNotes, writeNotes } from "../repositories/notes";
-import { IFullNote, INote, IStats } from "../helpers/interfaces";
+import { NotFound, Conflict } from "http-errors";
+import { INote, IStats } from "../helpers/interfaces";
+import { NotesModel } from "../models/notes-model";
 
-const createNote = async (note: INote) => {
-  const notes = await readNotes();
+const getAllNotes = async (owner: string) => {
+  const notes = await NotesModel.find({ owner });
 
   if (!notes) {
     throw new NotFound("Data not found");
   }
 
-  const newNote = {
-    id: uuidv4(),
-    name: note.name,
-    created: Date.now(),
-    category: note.category,
-    content: note.content,
-    archived: false,
-  };
-
-  const newNotes = [...notes, newNote];
-
-  writeNotes(newNotes);
-
-  return newNote;
+  return notes;
 };
 
-const removeNote = async (id: string) => {
-  const notes = await readNotes();
-
-  if (!notes) {
-    throw new NotFound("Data not found");
-  }
-
-  const note = notes.find((el: IFullNote) => el.id === id);
+const getOneNote = async (owner: string, _id: string) => {
+  const note = await NotesModel.findOne({ _id, owner });
 
   if (!note) {
-    throw new NotFound("Note with this id not found");
+    throw new NotFound("Note not found");
   }
-
-  const newNotes = notes.filter((el: IFullNote) => el.id !== note.id);
-
-  writeNotes(newNotes);
 
   return note;
 };
 
-const editNote = async (id: string, editedNote: INote) => {
-  const notes = await readNotes();
+const createNote = async (id: string, { name, categoryId, content }: INote) => {
+  const copy = await NotesModel.findOne({ name });
 
-  if (!notes) {
-    throw new NotFound("Data not found");
+  if (copy) {
+    throw new Conflict("Note with such name already exists");
   }
 
-  const note = notes.find((el: IFullNote) => el.id === id);
+  return NotesModel.create({ owner: id, name, categoryId, content });
+};
+
+const editNote = async (id: string, editedNote: INote) => {
+  const note = await NotesModel.findByIdAndUpdate()
 
   if (!note) {
     throw new NotFound("Note with this id not found");
@@ -71,65 +51,60 @@ const editNote = async (id: string, editedNote: INote) => {
   return newEditedNote;
 };
 
-const getOneNote = async (id: string) => {
-  const notes = await readNotes();
+// const removeNote = async (id: string) => {
+//   const notes = await readNotes();
 
-  if (!notes) {
-    throw new NotFound("Data not found");
-  }
+//   if (!notes) {
+//     throw new NotFound("Data not found");
+//   }
 
-  const note = notes.find((el: IFullNote) => el.id === id);
+//   const note = notes.find((el: IFullNote) => el.id === id);
 
-  if (!note) {
-    throw new NotFound("Note with this id not found");
-  }
+//   if (!note) {
+//     throw new NotFound("Note with this id not found");
+//   }
 
-  return note;
-};
+//   const newNotes = notes.filter((el: IFullNote) => el.id !== note.id);
 
-const getAllNotes = async () => {
-  const notes = await readNotes();
+//   writeNotes(newNotes);
 
-  if (!notes) {
-    throw new NotFound("Data not found");
-  }
+//   return note;
+// };
 
-  return notes;
-};
 
-const getStats = async () => {
-  const notes = await readNotes();
+// const getStats = async () => {
+//   const notes = await readNotes();
 
-  if (!notes) {
-    throw new NotFound("Data not found");
-  }
+//   if (!notes) {
+//     throw new NotFound("Data not found");
+//   }
 
-  const stats = notes.reduce((acc: IStats, el: IFullNote) => {
-    if (acc[el.category]) {
-      el.archived
-        ? (acc[el.category].archivedCount += 1)
-        : (acc[el.category].activeCount += 1);
-    } else {
-      acc[el.category] = {};
-      acc[el.category].archivedCount = 0;
-      acc[el.category].activeCount = 0;
+//   const stats = notes.reduce((acc: IStats, el: IFullNote) => {
+//     if (acc[el.category]) {
+//       el.archived
+//         ? (acc[el.category].archivedCount += 1)
+//         : (acc[el.category].activeCount += 1);
+//     } else {
+//       acc[el.category] = {};
+//       acc[el.category].archivedCount = 0;
+//       acc[el.category].activeCount = 0;
 
-      el.archived
-        ? (acc[el.category].archivedCount += 1)
-        : (acc[el.category].activeCount += 1);
-    }
+//       el.archived
+//         ? (acc[el.category].archivedCount += 1)
+//         : (acc[el.category].activeCount += 1);
+//     }
 
-    return acc;
-  }, {});
+//     return acc;
+//   }, {});
 
-  return stats;
-};
+//   return stats;
+// };
 
 export const notesService = {
-  createNote,
-  removeNote,
-  editNote,
-  getOneNote,
   getAllNotes,
-  getStats,
+  getOneNote,
+  createNote,
+  editNote,
+  // removeNote,
+  // getStats,
 };

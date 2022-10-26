@@ -1,17 +1,20 @@
+import { ObjectId } from "mongoose";
+
 export interface IFullNote {
-  id: string;
+  _id: ObjectId;
   name: string;
-  created: number;
-  category: "Idea" | "Task" | "Random Thought";
+  categoryId: string;
   content: string;
   archived: boolean;
+  owner: ObjectId;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface INote {
   name: string;
-  category: "Idea" | "Task" | "Random Thought";
+  categoryId: string;
   content: string;
-  archived?: boolean;
 }
 
 export interface IStats {
@@ -23,4 +26,23 @@ export interface IStats {
 interface ICategoryStats {
   activeCount: number;
   archivedCount: number;
+}
+
+export interface IUser {
+  _id: ObjectId;
+  email: string;
+  password: string;
+  token: null | string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface IUserDto {
+  email: string;
+  password: string;
+}
+
+export interface IUpdateUserDto {
+  email?: string;
+  password?: string;
 }

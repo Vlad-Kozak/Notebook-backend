@@ -19,3 +19,8 @@ export const serializeNote = ({
     updatedAt,
   };
 };
+
+export const serializeNotes = (notes: IFullNote[]) => {
+  const newNotes = notes.map((el) => serializeNote(el));
+  return newNotes;
+};

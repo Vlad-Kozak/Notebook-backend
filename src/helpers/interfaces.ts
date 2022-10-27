@@ -7,8 +7,8 @@ export interface IFullNote {
   content: string;
   archived: boolean;
   owner: ObjectId;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface INote {
@@ -33,8 +33,8 @@ export interface IUser {
   email: string;
   password: string;
   token: null | string;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUserDto {
@@ -45,4 +45,10 @@ export interface IUserDto {
 export interface IUpdateUserDto {
   email?: string;
   password?: string;
+}
+
+export interface ICategory {
+  _id: ObjectId;
+  name: string;
+  photoURL: string;
 }

@@ -6,6 +6,7 @@ import { HttpError } from "http-errors";
 import { conf } from "./config";
 import { authRouter } from "./routes/auth-routes";
 import { notesRouter } from "./routes/notes-routes";
+import { categoriesRouter } from "./routes/categories-routes";
 
 const app: Express = express();
 
@@ -17,10 +18,11 @@ app.use(express.json());
 
 app.use("/api/auth", authRouter);
 app.use("/api/notes", notesRouter);
+app.use("/api/categories", categoriesRouter);
 
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   const statusCode = err.status || 500;
-  res.status(statusCode).send(err.message);
+  res.status(statusCode).send({ error: { message: err.message } });
 });
 
 const port = conf.port;

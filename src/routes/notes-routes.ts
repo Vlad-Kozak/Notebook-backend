@@ -4,16 +4,28 @@ import { validate } from "../helpers/middlewares/validate";
 import { catchAsync } from "../helpers/middlewares/catch-async";
 import { notesService } from "../services/notes-service";
 import { authorize } from "../helpers/middlewares/authorize";
-import { serializeNote } from "../serializers/notes-serializers";
+import {
+  serializeNote,
+  serializeNotes,
+} from "../serializers/notes-serializers";
 
 export const notesRouter = Router();
+
+notesRouter.get(
+  "/stats",
+  authorize,
+  catchAsync(async (req, res, next) => {
+    const stats = await notesService.getStats(req.body.userId);
+    res.status(200).send(stats);
+  })
+);
 
 notesRouter.get(
   "/",
   authorize,
   catchAsync(async (req, res, next) => {
-    const response = await notesService.getAllNotes(req.body.userId);
-    res.status(200).send(response);
+    const notes = await notesService.getAllNotes(req.body.userId);
+    res.status(200).send(serializeNotes(notes));
   })
 );
 
@@ -36,27 +48,25 @@ notesRouter.post(
   })
 );
 
-// notesRouter.delete(
-//   "/:id",
-//   catchAsync(async (req, res, next) => {
-//     const note = await notesService.removeNote(req.params.id);
-//     res.status(200).send(note);
-//   })
-// );
+notesRouter.patch(
+  "/:id",
+  authorize,
+  validate(editedNoteSchema),
+  catchAsync(async (req, res, next) => {
+    const note = await notesService.editNote(
+      req.body.userId,
+      req.params.id,
+      req.body
+    );
+    res.status(200).send(serializeNote(note));
+  })
+);
 
-// notesRouter.patch(
-//   "/:id",
-//   validate(editedNoteSchema),
-//   catchAsync(async (req, res, next) => {
-//     const note = await notesService.editNote(req.params.id, req.body);
-//     res.status(200).send(note);
-//   })
-// );
-
-// notesRouter.get(
-//   "/stats",
-//   catchAsync(async (req, res, next) => {
-//     const stats = await notesService.getStats();
-//     res.status(200).send(stats);
-//   })
-// );
+notesRouter.delete(
+  "/:id",
+  authorize,
+  catchAsync(async (req, res, next) => {
+    const note = await notesService.removeNote(req.body.userId, req.params.id);
+    res.status(200).send(serializeNote(note));
+  })
+);

@@ -24,7 +24,6 @@ export const authorize = async (
   if (!user || user.token !== token) {
     return res.status(401).send("Not authorized");
   }
-
   req.body.userId = payload.sub;
   next();
 };

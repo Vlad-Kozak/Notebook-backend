@@ -8,6 +8,7 @@ export const noteSchema = Joi.object({
 }).required();
 
 export const editedNoteSchema = Joi.object({
+  userId: Joi.string().required(),
   name: Joi.string().max(50),
   categoryId: Joi.string(),
   content: Joi.string().max(1000),

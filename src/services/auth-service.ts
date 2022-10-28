@@ -7,11 +7,11 @@ import { IUpdateUserDto, IUser, IUserDto } from "../helpers/interfaces";
 
 const register = async (dto: IUserDto) => {
   const { email, password } = dto;
-  // const existingUser = await UserModel.findOne({ email });
+  const existingUser = await UserModel.findOne({ email });
 
-  // if (existingUser) {
-  //   throw new Conflict("Email in use");
-  // }
+  if (existingUser) {
+    throw new Conflict("Email in use");
+  }
 
   const user = UserModel.create({
     email,

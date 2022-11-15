@@ -1,9 +1,16 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Conflict, Unauthorized, NotFound, BadRequest } from "http-errors";
+import { Conflict, Unauthorized } from "http-errors";
 import { UserModel } from "../models/users-model";
 import { conf } from "../config";
 import { IUpdateUserDto, IUser, IUserDto } from "../helpers/interfaces";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client({
+  clientId: conf.googleClientId,
+  clientSecret: conf.googleClientSecret,
+  redirectUri: conf.googleRedirectUri,
+});
 
 const register = async (dto: IUserDto) => {
   const { email, password } = dto;
@@ -41,6 +48,27 @@ const login = async (dto: IUserDto) => {
   return { user, token };
 };
 
+const google = async (dto: any) => {
+  const { tokens } = await googleClient.getToken(dto.code);
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken: `${tokens.id_token}`,
+  });
+
+  const { email } = ticket.getPayload();
+
+  let user = await UserModel.findOne({ email });
+
+  if (!user) {
+    user = await UserModel.create({ email });
+  }
+
+  const token = generateToken(user);
+  user = await UserModel.findByIdAndUpdate(user._id, { token }, { new: true });
+
+  return user;
+};
+
 const getCurrentUser = async (userId: string) => {
   const user = await UserModel.findById(userId);
   return user;
@@ -75,6 +103,7 @@ const generateToken = (user: IUser) => {
 export const authService = {
   register,
   login,
+  google,
   getCurrentUser,
   logout,
   updateUser,

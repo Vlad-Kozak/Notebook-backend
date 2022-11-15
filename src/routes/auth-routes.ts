@@ -28,6 +28,15 @@ authRouter.post(
   })
 );
 
+authRouter.post(
+  "/google",
+  catchAsync(async (req, res, next) => {
+    const response = await authService.google(req.body);
+    const { user, token } = response;
+    res.status(201).send(serializeLogin(user, token));
+  })
+);
+
 authRouter.get(
   "/current",
   authorize,

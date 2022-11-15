@@ -30,6 +30,24 @@ const config = convict({
     default: "",
     env: "JWT_SECRET",
   },
+  googleClientId: {
+    doc: "google client id",
+    format: String,
+    default: "",
+    env: "CLIENT_ID",
+  },
+  googleClientSecret: {
+    doc: "google client secret",
+    format: String,
+    default: "",
+    env: "CLIENT_SECRET",
+  },
+  googleRedirectUri: {
+    doc: "google redirect uri",
+    format: String,
+    default: "",
+    env: "REDIRECT_URI",
+  },
 });
 
 export const conf = config.validate({ allowed: strict }).getProperties();

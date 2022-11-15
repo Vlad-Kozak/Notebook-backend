@@ -66,7 +66,7 @@ const google = async (dto: any) => {
   const token = generateToken(user);
   user = await UserModel.findByIdAndUpdate(user._id, { token }, { new: true });
 
-  return user;
+  return { user, token };
 };
 
 const getCurrentUser = async (userId: string) => {

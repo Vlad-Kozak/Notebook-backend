@@ -23,7 +23,7 @@ const getOneNote = async (owner: string, _id: string) => {
 };
 
 const createNote = async (id: string, { name, categoryId, content }: INote) => {
-  const copy = await NotesModel.findOne({ name });
+  const copy = await NotesModel.findOne({ name, owner: id });
 
   if (copy) {
     throw new Conflict("Note with such name already exists");

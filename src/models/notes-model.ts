@@ -7,7 +7,6 @@ const notesSchema = new Schema<IFullNote>(
     name: {
       type: String,
       required: [true, "Set name for note"],
-      unique: true,
     },
     categoryId: {
       type: String,

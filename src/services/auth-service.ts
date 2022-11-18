@@ -60,7 +60,8 @@ const google = async (dto: any) => {
   let user = await UserModel.findOne({ email });
 
   if (!user) {
-    user = await UserModel.create({ email });
+    const password = hashPassword(email + conf.secret);
+    user = await UserModel.create({ email, password });
   }
 
   const token = generateToken(user);
